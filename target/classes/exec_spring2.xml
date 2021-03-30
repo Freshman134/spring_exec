@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<!-- 注释装配 -->
+	<!-- 
+	以下注解可将类注册到容器中：
+		@Controller
+		@Repository
+		@Service
+		@Component
+	 -->
+	 <!-- 开启包扫描 -->
+	<context:component-scan base-package="com.howieLuk.spring_exec"></context:component-scan>
+	
+	
+	<!-- 泛型依赖注入 -->
+	<!-- 通过bean标签创建内部类 -->
+	<!-- 模板类 -->
+	<bean id="car1" class="com.howieLuk.spring_exec.exec.pojo.Car" abstract="true">
+		<property name="driver">
+			<bean class="com.howieLuk.spring_exec.exec.pojo.User">
+				<constructor-arg name="username" value="user2"></constructor-arg>
+				<constructor-arg name="email" value="user2@123.com"></constructor-arg>
+			</bean>
+		</property>
+	</bean>
+	<bean id="car" parent="car1" class="com.howieLuk.spring_exec.exec.pojo.Car" scope="prototype"></bean>
+	
+</beans>

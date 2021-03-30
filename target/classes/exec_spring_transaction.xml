@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<!-- 
+		事务特性：A(原子性)C(一致性)I(隔离性)D(持久性)
+		声明式事务：
+			通过告诉spring哪个是事务方法即可，spring通过事务管理器对目标方法进行事务控制
+	 -->
+	
+	<!-- 事务控制配置流程：-->
+	<!-- 1. 配置事务管理器 -->
+	<!-- tx配置 -->
+	<!-- <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> -->
+		<!-- <property name="dataSource" ref="dataSource"></property> -->
+	<!-- </bean> -->
+	<!-- 2. 开启基于注解的事务控制模式 -->
+	<!-- <tx:annotation-driven transaction-manager="transactionManager"/> -->
+	<!-- 3. 给目标方法添加@Transactional注解即可 -->
+	
+	<!-- 
+	事务细节：
+		@Transactional参数：
+			isolation:Isolation
+				隔离级别：
+					读未提交：允许读取未提交的数据
+					读已提交：只允许读取已提交的数据
+					可重复读：确保在一个事务期间被读取字段一定能够被读取，禁止其他事务对该字段进行修改（相当于上锁）
+					串行化：一个一个事务执行（不会用到）
+			propagation:Propagation
+			
+			noRollbackFor:Class[]
+			noRollbackForClassName:String[]
+			rollbackFor:Class[]
+			rollbackForClassName:String[]
+			编译异常默认不回滚
+			运行时异常(RuntimeException的子类)默认回滚
+			timeout:int
+			readOnly:boolean
+	 -->
+	
+</beans>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+	<!-- aop（面向切面编程）:将某段代码动态的切入到指定方法的指定位置的编程方式就是aop -->
+	<!-- 
+	使用步骤：
+		1. 注册切面类
+		2. 使用注解标记类为切面
+		4. 写pointCut空方法，并对其注释@pointCut(切面表达式)
+		5. 写方法，并将pointCut()作为值传递到切面注解中，如：@Before("pointCut()")
+	细节：
+		1. 当获取被代理的bean时，spring返回的是一个代理对象，代理对象与被代理的bean需要实现一个共同的接口（参考代理模式）
+		，但spring（cglib）不受此影响，cglib可以为没有接口的组件创建代理对象
+		2. 通知方法执行顺序：
+			正常执行：@Before -> method.invoke -> @After -> @AfterReturning
+			                          \/
+			异常执行：           @AfterThrowing -> @After
+		3. 可以在通知方法运行时拿到目标方法的详细信息在通知方法添加参数（JoinPoint jointPoint）
+		4. 通知方法的参数不能错误
+	 -->
+	<context:component-scan base-package="com.howieLuk.spring_exec.exec.aop,com.howieLuk.spring_exec.exec.dao"></context:component-scan>
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	
+	<!-- 
+	多切面排序：
+		@Order可以改变切面类优先级，数值越小优先级越高
+		
+	
+	 -->
+	
+</beans>

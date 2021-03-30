@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+	<!-- setters构造bean，通过反射机制 -->
+	<bean id="root" class="com.howieLuk.spring_exec.exec.pojo.User">
+		<property name="username" value="root"/>
+		<property name="email" value="root@123.com"/>
+		<property name="password">
+			<null /> <!-- 赋值null -->
+		</property>
+		<property name="createTime" value="0"/>
+	</bean>
+	<!-- 通过构造函数构造bean -->
+	<bean id="user1" class="com.howieLuk.spring_exec.exec.pojo.User">
+		<constructor-arg name="username" value="user1"></constructor-arg>
+		<constructor-arg name="email" value="user1@123.com"></constructor-arg>
+		<constructor-arg name="password" value="123456"></constructor-arg>
+		<constructor-arg name="createTime" value="0"></constructor-arg>
+	</bean>
+	
+	<!-- 通过util命名空间创建集合类型bean，方便引用,如map、list -->
+	<!-- map -->
+	<util:map id="maps">
+		<entry key="key1" value="1"/>
+		<entry key="key2" value-ref="user1"/>
+	</util:map>
+	<!-- list -->
+	<util:list id="li">
+		<ref bean="root"/>
+		<bean id="user3" class="com.howieLuk.spring_exec.exec.pojo.User"> <!-- 该id仅能在内部使用 -->
+			<constructor-arg name="username" value="user3"></constructor-arg>
+			<constructor-arg name="email" value="user3@123.com"></constructor-arg>
+		</bean>
+	</util:list>
+	<!-- 通过bean标签创建内部类 -->
+	<bean id="car1" class="com.howieLuk.spring_exec.exec.pojo.Car">
+		<property name="driver">
+			<bean class="com.howieLuk.spring_exec.exec.pojo.User">
+				<constructor-arg name="username" value="user2"></constructor-arg>
+				<constructor-arg name="email" value="user2@123.com"></constructor-arg>
+			</bean>
+		</property>
+		<property name="passenger">
+		<!-- 创建list -->
+		<list>
+			<ref bean="root"/>
+			<bean id="user3" class="com.howieLuk.spring_exec.exec.pojo.User"> <!-- 该id仅能在内部使用 -->
+				<constructor-arg name="username" value="user3"></constructor-arg>
+				<constructor-arg name="email" value="user3@123.com"></constructor-arg>
+			</bean>
+		</list>
+		</property>
+	</bean>
+	
+	<!-- 通过ref属性引用内部类 -->
+	<bean id="car2" class="com.howieLuk.spring_exec.exec.pojo.Car">
+		<property name="driver" ref="user1"></property>
+		<property name="maps">
+			<!-- 通过 -->
+			<map>
+				<entry key="key1" value="1"/>
+				<entry key="key2" value-ref="user1"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- 属性的属性就是级联属性 -->
+	<bean id="car3" class="com.howieLuk.spring_exec.exec.pojo.Car">
+		<property name="driver">
+			<bean class="com.howieLuk.spring_exec.exec.pojo.User">
+				<constructor-arg name="username" value="user1" />
+				<constructor-arg name="email" value="user4@123.com"/>
+			</bean>
+		</property>
+		<!-- 级联赋值 -->
+		<property name="driver.username" value="user4" />
+	</bean>
+	
+	<!-- 通过继承实现bean配置信息重用,注意是配置信息而已,两个bean是不一样的 -->
+	<bean id="car4" parent="car1" class="com.howieLuk.spring_exec.exec.pojo.Car" scope="prototype"></bean> <!-- 多实例、原型 -->
+	
+	<!-- 创建bean模板实例，这个不是实例bean，无法通过该id获取实例 -->
+	<bean id="user_template" class="com.howieLuk.spring_exec.exec.pojo.User" abstract="true">
+		<constructor-arg name="username" value="user"></constructor-arg>
+		<constructor-arg name="email" value="user@123.com"></constructor-arg>
+	</bean>
+	<bean id="user4" class="com.howieLuk.spring_exec.exec.pojo.User" parent="user_template">
+		<property name="username" value="user4"></property>
+		<property name="email" value="user4@123.com"></property>
+	</bean>
+	<!-- 通过静态工厂 -->
+	<bean id="user5" class="com.howieLuk.spring_exec.exec.factory.UserStaticFactory" factory-method="getUser">
+		<constructor-arg value="user5"></constructor-arg>
+		<constructor-arg value="user5@123.com"></constructor-arg>
+	</bean>
+	<!-- 实例工厂 -->
+	<bean id="userFactory" class="com.howieLuk.spring_exec.exec.factory.UserFactory"></bean>
+	<bean id="user6" class="com.howieLuk.spring_exec.exec.pojo.User" factory-bean="userFactory" factory-method="getUser">
+		<constructor-arg value="user6"></constructor-arg>
+		<constructor-arg value="user6@123.com"></constructor-arg>
+	</bean>
+	<!-- FactoryBean创建实例 -->
+	<bean id="car5" class="com.howieLuk.spring_exec.exec.factory.CarFactoryBean"></bean>
+	
+	<!-- 
+	bean的创建和销毁:
+	单例bean：容器启动就创建好了，当容器关闭时会自动销毁
+	多实例：获取时才创建
+	bean标签的destroy-method是销毁时执行的方法
+				init-method是创建时执行的方法，值为bean里的方法
+	Bean的生命周期如下：
+		（单例）1.构造器（工厂创建或setters注入创建） -> 初始化（调用初始化方法） -> 容器关闭 -> 销毁（调用销毁方法）
+		（多例）1.用户获取对象 -> 构造 -> 初始化 -> 不再管理该bean
+	 -->
+	
+	<!-- BeanPostProcessor -->
+	<!-- 实现BeanPostProcessor接口 -->
+	<!-- 将实现类注册为bean -->
+	<bean id="beanPostProcessor" class="com.howieLuk.spring_exec.exec.MyBeanPostProcessor"></bean>
+	
+	<!-- 注册外部资源文件，通过context命名空间 -->
+	<!-- <context:property-placeholder location=""/> -->
+	<!-- 注意！：${username}有特殊含义不能直接使用 -->
+	
+	<!-- 
+	spEL:
+		#{表达式、bean属性、静态方法T().func、实例方法}
+	 -->
+	
+</beans>

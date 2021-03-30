@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.howieLuk.spring_exec.exec.dao.mappers.UserMapper">
+	<!-- 该mapper接口使用二级缓存，注意缓存的POJO需要实现Serializable接口（如果cache需要实现读写功能）
+			缓存查询顺序（先看二级缓存再看一级缓存）：
+				不会出现一级缓存与二级缓存中有同一个数据（不一定？）：
+					二级缓存中，一级缓存关闭了就有了，
+					一级缓存中，二级缓存中没有此数据，就会看一级缓存，一级缓存没有去查数据库，查询完后的结果放入一级缓存
+	 -->
+	<cache readOnly="true">
+	</cache>
+	<select id="get" resultType="User">
+		select <include refid="cols" /> from user where id=#{id}
+	</select>
+	<select id="getAll" resultType="User">
+		select <include refid="cols" /> from user
+	</select>
+	<insert id="save" parameterType="User">
+		insert into user(username, email, password) values(#{username}, #{email}, #{password})
+	</insert>
+	
+	<update id="updatePasswordByUsername">
+		update user set password=#{password} where username=#{username}
+	</update>
+	
+	<!-- 记录只有一个时可以这样用 -->
+	<select id="getUserMapById" resultType="map">
+		select id, username, email, password, UNIX_TIMESTAMP(create_time) as create_time from user where id=#{id}
+	</select>
+	
+	<!-- 记录有多个时将Type改成pojo类 -->
+	<select id="getUserMap" resultType="User">
+		select id, username, email, password, UNIX_TIMESTAMP(create_time) as create_time from user
+	</select>
+	
+	<!-- 动态注入条件 -->
+	<!-- 缓存相关属性：
+	useCache="true"  # 该方法使用二级缓存
+	flushCache="true"  #该方法被调用时清空二级缓存
+	 -->
+	<select id="getUser" resultType="User" useCache="true">
+		select id, username, email, password, UNIX_TIMESTAMP(create_time) as create_time from user
+		<where>
+			<if test='id!=null and id!=0'>
+				and id=#{id}
+			</if>
+			<if test='username!=null and username!=""'>
+				and username=#{username}
+			</if>
+			<if test='email!=null and email!=""'>
+				and email=#{email}
+			</if>
+			<if test='password!=null and password!=""'>
+				and password=#{password}
+			</if>
+		</where>
+		<!-- 
+		类似于switch case default
+		<choose>
+			<when test=""></when>
+			<otherwise></otherwise>
+		</choose>
+		 -->
+	</select>
+	
+	<select id="getUsersById" resultType="User">
+		select <include refid="cols" /> from user 
+		where id in (<foreach collection="ids" separator="," item="id">#{id}</foreach>)
+	</select>
+	
+	<update id="updateById">
+		update user 
+		<set>
+			<if test='username!=null and username!=""'>
+				username=#{username},
+			</if>
+			<if test='email!=null and email!=""'>
+				email=#{email},
+			</if>
+			<if test='password!=null and password!=""'>
+				password=#{password},
+			</if>
+		</set>
+		<where>id=#{id}</where>
+	</update>
+	
+	<!-- 抽取可重用sql -->
+	<sql id="cols">
+		id, username, email, password, UNIX_TIMESTAMP(create_time) as create_time
+	</sql>
+	
+	<!-- 
+		默认mybatis自动封装结果集：
+			1. 按照列名属性名一一对应原则（不区分大小写）
+			2. 如果不一一对应：
+				1. 驼峰命名法则
+				2. 起别名
+				3. resultMap	
+	 -->
+	
+	<!-- OGNL表达式:
+		访问对象属性：obj.property
+		调用方法：obj.func()
+		调用静态属、方法：@java.lang.Math@PI、@java.util.UUID@randomUUID()
+		运算符：+ - * / %
+		逻辑运算符：in, not in, >, >=, <, <=, ==, !=
+		访问集合伪属性：
+			List、Set、Map 伪属性：size、isEmpty
+			List、Set 伪属性：iterator
+			Map 伪属性：keys、values
+			Iterator 伪属性:next、hasNext
+	 -->
+	
+	<select id="getByCondition" resultType="User" useCache="true">
+		select id, username, email, password, UNIX_TIMESTAMP(create_time) as create_time from user
+		<where>
+			<if test='id!=null and id!=0'>
+				and id=#{id}
+			</if>
+			<if test='username!=null and username!=""'>
+				and username=#{username}
+			</if>
+			<if test='email!=null and email!=""'>
+				and email=#{email}
+			</if>
+			<if test='password!=null and password!=""'>
+				and password=#{password}
+			</if>
+		</where>
+	</select>
+	
+	<update id="update">
+		update user 
+		<set>
+			<if test='username!=null and username!=""'>
+				username=#{username},
+			</if>
+			<if test='email!=null and email!=""'>
+				email=#{email},
+			</if>
+			<if test='password!=null and password!=""'>
+				password=#{password},
+			</if>
+		</set>
+		<where>#{id} = id</where>
+	</update>
+	
+</mapper>

@@ -1,0 +1,71 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<!-- 所有项目的web.xml都继承服务器的web.xml -->
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	
+	<!-- 
+	/*
+	 * 提交数据乱码解决：
+	 * 		请求乱码：
+	 * 			GET请求：改server.xml在<connector>标签的属性设置URIEncoding="UTF-8"
+	 * 			POST请求：使用CharacterEncodingFilter或request.setCharacterEncoding("UTF-8")
+	 * 		相应乱码：
+	 * 			使用CharacterEncodingFilter或response.setContentType("text/html; charset'UTF-8'")
+	 * 	
+	 * 	CharacterEncodingFilter需要设置在其他Filter之前
+	 */
+	 -->
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+	</filter>
+	
+	<!-- 支持Rest风格的filter -->
+	<filter>
+		<filter-name>hiddenHttpMethodFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>hiddenHttpMethodFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- The front controller of this Spring Web application, responsible for 
+		handling all application requests -->
+	<servlet>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 如果没有设置该参数，默认是/WEB-INF/#{servlet-name}.xml -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:spring_mvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<!-- Map all requests to the DispatcherServlet for handling -->
+	<servlet-mapping>
+		<servlet-name>springDispatcherServlet</servlet-name>
+		<!-- 
+			/和/*会拦截所有请求，二 /* 会拦截到jsp文件访问，因此/*的访问范围更大
+				注意：/会阻止*.html的访问
+		 -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+</web-app>

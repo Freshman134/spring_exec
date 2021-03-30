@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.howieLuk.spring_exec.exec.dao.mappers.StudentDao">
+	<select id="get" parameterType="Long" resultType="Student">
+		select * from student where student_id = #{id}
+	</select>
+	<select id="getAll" resultType="Student">
+		select * from student
+	</select>
+	<insert id="save" parameterType="Student">
+		insert into test_db.student(name, no, sex, grade, class_name)
+		 values(#{name}, #{no}, #{sex}, #{grade}, #{className})
+	</insert>
+	<select id="getByCondition" resultType="Student">
+		select * from student 
+		<where>
+			<if test='studentId != null'>
+				and student_id = #{studentId}
+			</if>
+			<if test='name != null and name != ""'>
+				and name = #{name}
+			</if>
+			<if test='no != null and no != ""'>
+				and no = #{no}
+			</if>
+			<if test='sex != null'>
+				and sex = ${sex}
+			</if>
+			<if test='grade != null'>
+				and grade = #{grade}
+			</if>
+			<if test='className != null and className != ""'>
+				and class_name = #{className}
+			</if>
+		</where>
+	</select>
+	
+	<update id="update">
+		update student
+		<set>
+			<if test='name != null and name != ""'>
+				name=#{name},
+			</if>
+			<if test='no != null and no != ""'>
+				no = #{no},
+			</if>
+			<if test='sex != null'>
+				sex = ${sex},
+			</if>
+			<if test='grade != null'>
+				grade = #{grade},
+			</if>
+			<if test='className != null and className != ""'>
+				class_name = #{className},
+			</if>
+		</set>
+		<where>student_id = #{id}</where>
+	</update>
+	
+	<delete id="delete">
+		delete from student where student_id = #{id}
+	</delete>
+	
+</mapper>
